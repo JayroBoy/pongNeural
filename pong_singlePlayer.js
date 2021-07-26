@@ -1,12 +1,12 @@
 var raquete = [340, 15] // Posição em Y, Velocidade 
 var bola = [350, 350, 30, 4, 4]//Posição em X, Posição em Y, Diâmetro, Velocidade em X, Velocidade em Y
-var points = [0, 420]
+var points = [0, 420] //Pontuação, posição em x na tela
 var tSize = 100
-var vidas = 3
+var vidas = 0
 
 function reset(death){
   if (death){
-    vidas = 3
+    vidas = 0
     points = [0, 420]
     tSize = 100
     bola = [350, 350, 30, 4, 4]
@@ -21,8 +21,8 @@ function checkGameOver(){
   if(vidas === 0){
     bola[3] = 0
     bola[4] = 0
-    points[0] = "Game over. Press R to retry"
-    points[1] = 350
+    points[0] = "Game over. Press the R to retry"
+    points[1] = 340
     tSize = 20
     if(keyIsDown(82)){
       reset(true)
@@ -59,12 +59,12 @@ function draw() {
   
   //Bola
   fill("purple")
-  circle(bola[0], bola[1], bola[2])
+  ellipse(bola[0], bola[1], bola[2], bola[2])
   
   
   //vidas
   for(i = 0; i < vidas; i++){
-    circle(390 + (i*40), 50, 30)
+    ellipse(390 + (i*40), 50, 30, 30)
   }
   
   
