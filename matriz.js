@@ -74,7 +74,7 @@ class Matriz {
     }
     
     // Matriz x Matriz
-    static mulMatriz(A, B) {
+    static hadamard(A, B) {
         var matriz = new Matriz(A.linhas, A.colunas);
 
         matriz.map((num, i, j) => {
