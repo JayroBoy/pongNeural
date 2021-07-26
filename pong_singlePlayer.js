@@ -91,28 +91,39 @@ function draw() {
   //-----------------------Colisões----------------------------------
   
   //Bola com o topo
-  if(bola[1] - (bola[2]/2) < 23){
+  if(bola[1] - (bola[2]/2) < 24){
     bola[4] = -bola[4]
   } 
   
   //Bola com o fundo
-  if(bola[1] + (bola[2]/2) > 725){
+  if(bola[1] + (bola[2]/2) > 724){
     bola[4] = -bola[4]
   } 
   
   //Bola com a borda direita
-  if(bola[0] + (bola[2]/2) > 877){
+  if(bola[0] + (bola[2]/2) > 876){
     bola[3] = -bola[3]
-  }
+    bola[4] = (Math.floor(Math.random() * 10) - 5)
+    if(bola[4] > 0){
+        bola[4] += 5
+    }else{
+        bola[4] -= 5
+    }  
+}
   
   //bola com a raquete
   if(bola[0] - (bola[2]/2) < 20){
     if(bola[1]  > raquete[0] && bola[1] < raquete[0] + 120){
       bola[3] = -bola[3]
+      bola[4] = (Math.floor(Math.random() * 10) - 5) 
+      if(bola[4] > 0){
+          bola[4] += 5
+      }else{
+          bola[4] -= 5
+      }  
       points[0]++
     }else{
       checkGameOver()
     }
   }
-  
 }
