@@ -29,7 +29,7 @@ class Matriz {
         return array;
     }
 
-    random() {
+    randomize() {
         this.map((elm, i, j) => {
             return Math.random() * 2 - 1;
         });

@@ -15,19 +15,19 @@ class RedeNeural {
 
         // Bias input -> hidden
         this.bias_ih = new Matriz(this.hidden, 1);
-        this.bias_ih.random();
+        this.bias_ih.randomize();
 
         // Bias hidden -> output
         this.bias_ho = new Matriz(this.output, 1);
-        this.bias_ho.random();
+        this.bias_ho.randomize();
 
         // Peso input -> hidden
         this.peso_ih = new Matriz(this.hidden, this.input);
-        this.peso_ih.random()
+        this.peso_ih.randomize()
 
         // Peso hidden -> output
         this.peso_ho = new Matriz(this.output, this.hidden)
-        this.peso_ho.random()
+        this.peso_ho.randomize()
 
         // Taxa de aprendizado
         this.aprendizado = 0.1; 
@@ -71,7 +71,7 @@ class RedeNeural {
         let hidden_erro = Matriz.mul(peso_ho_transp,output_erro);
         let d_hidden = Matriz.map(hidden, dsig);
         let input_transp = Matriz.transp(input);
-        
+
         // Calculando gradiente na camada oculta
         let gradiente_hidden = Matriz.hadamard(d_hidden, hidden_erro);
         gradiente_hidden = Matriz.escalar(gradiente_hidden, this.aprendizado);
