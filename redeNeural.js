@@ -71,7 +71,7 @@ class RedeNeural {
         let hidden_erro = Matriz.mul(peso_ho_transp,output_erro);
         let d_hidden = Matriz.map(hidden, dsig);
         let input_transp = Matriz.transp(input);
-
+        
         // Calculando gradiente na camada oculta
         let gradiente_hidden = Matriz.hadamard(d_hidden, hidden_erro);
         gradiente_hidden = Matriz.escalar(gradiente_hidden, this.aprendizado);

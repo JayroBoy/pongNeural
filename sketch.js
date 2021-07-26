@@ -4,15 +4,15 @@ function setup() {
     rede = new RedeNeural(2, 3, 1);
     data = {
         inputs: [
-            [4, 1],
-            [1, 2],
+            [1, 1],
+            [1, 0],
             [0, 1],
-            [2, 0]
+            [0, 0]
         ],
         outputs: [
             [0],
             [1],
-            [2],
+            [1],
             [0]
         ]
     }
