@@ -5,53 +5,73 @@
  */
 
 
-
+// AE
 var jogadores = [] //Registro da população
 var placar = [] //Classificação da população
-var curGen = 1
-/*  jogadores = [
-        [0,1],
-        [2,3],
-        [4,5],
-        [6,7],
-        [8,9],
-        [4,1],
-        [7,2],
-        [4,3],
-        [4,4],
-        [1,3],
-    ]
-*/ 
 
-function decidirDirecao(jogador, posicaoRaquete, velocidadeRaquete, bola){
-    posicaoRaquete += velocidadeRaquete * 
-    (((bola[0] - 34) * jogador[0]) +
-    ((bola[1] - (posicaoRaquete + 60 ) < 0 ? 0 : bola[1] - (posicaoRaquete + 60 )) * jogador[1]))/
-    (jogador[0] + jogador[1])
+// PONG
+var alive  = true //para saber quando sair do loop
+
+const velocidadeRaquete = 10 
+var posicaoRaquete = 300
+
+var bola = [350, 350, 30]//X, Y, Diâmetro
+var velocidadeBolaX = 10
+var velocidadeBolaY = Math.floor(Math.random() * 10) - 5
+
+const maxDistHorizontal = 829
+const maxDistVertical = 820
+
+var score = 0
+var height = 750
+
+
+//Funçoes
+function sigmoid(t) {
+    return 1/(1 + Math.pow(Math.E, -t));
 }
 
-function colisaoTopo(bola, velocidadeBolaY){
+
+function decidirDirecao(player){
+    if(velocidadeBolaX != 0){
+        var distHorizontal = (Math.abs(bola[0] - 34)/maxDistHorizontal)  //Posição em X do centro da bola - posição da borda direita da raquete
+        var distVertical = (Math.abs(bola[1] - (posicaoRaquete + 60))/maxDistVertical)   //Posição em Y do centro da bola - linha central da raquete
+        var decisor = ((distHorizontal/maxDistHorizontal * player[0]) + (distVertical/maxDistVertical * player[1]))
+        decisor = sigmoid(decisor)
+        //console.log(decisor)
+        if(decisor < .5){
+            return 1//para baixo
+        }else {
+            return -1//para cima
+        }
+    }else{
+        return 0
+    }
+}
+
+
+function colisaoTopo(){
     if(bola[1] - (bola[2]/2) < 25){
         return true
     }
     return false 
 }
 
-function colisaoFundo(bola, velocidadeBolaY){
+function colisaoFundo(){
     if(bola[1] + (bola[2]/2) > 724){
         return true
     } 
     return false
 }
 
-function colisaoDireita(bola, velocidadeBolaX, velocidadeBolaY){
+function colisaoDireita(){
     if(bola[0] + (bola[2]/2) > 875){
         return true 
     }
     return false
 }
 
-function colisaoRaquete(bola, posicaoRaquete, score, alive){
+function colisaoRaquete(){
     if(bola[0] - (bola[2]/2) < 20){ //Se a bola estiver na coluna da raquete
         if(bola[1]  > posicaoRaquete && bola[1] < posicaoRaquete + 120){ //Se a bola estiver nas linhas da raquete
             score++//Ganha um ponto
@@ -68,20 +88,26 @@ function colisaoRaquete(bola, posicaoRaquete, score, alive){
 //Funções do AE
     //Essa função faz um determinado jogador passar pelo pong.
     function testar(jogador){
-        var alive  = true //para saber quando sair do loop
+        
+        alive  = true //para saber quando sair do loop
+ 
+        posicaoRaquete = 300
 
-        const velocidadeRaquete = 10 
-        var posicaoRaquete = 300
-    
-        var bola = [350, 350, 30]//X, Y, Diâmetro
-        var velocidadeBolaX = 10
-        var velocidadeBolaY = Math.floor(Math.random() * 10) - 5
-    
-        var score = 0
-        var height = 750
+        bola = [350, 350, 30]//X, Y, Diâmetro
+        velocidadeBolaX = 10
+        velocidadeBolaY = Math.floor(Math.random() * 10) - 5
+
+        score = 0
+        height = 750
+        let i = 0
 
         while(alive){
-            decidirDirecao(jogador, posicaoRaquete, velocidadeRaquete, bola)
+            if(decidirDirecao(jogador) === 1){
+                posicaoRaquete += velocidadeRaquete
+            }else{
+                posicaoRaquete += -velocidadeRaquete
+            }
+
             if(posicaoRaquete < 2){
                 posicaoRaquete = 2
             }else if(posicaoRaquete > height - 122){
@@ -91,13 +117,13 @@ function colisaoRaquete(bola, posicaoRaquete, score, alive){
             bola[0] += velocidadeBolaX 
             bola[1] += velocidadeBolaY 
     
-            if(colisaoTopo(bola)){
+            if(colisaoTopo()){
                 velocidadeBolaY = -velocidadeBolaY
             }
-            else if(colisaoFundo(bola)){
+            else if(colisaoFundo()){
                 velocidadeBolaY = -velocidadeBolaY
             }
-            else if(colisaoDireita(bola)){
+            else if(colisaoDireita()){
                 velocidadeBolaX = -velocidadeBolaX
                 velocidadeBolaY = (Math.floor(Math.random() * 10) - 5)
                 if(velocidadeBolaY > 0){
@@ -106,7 +132,7 @@ function colisaoRaquete(bola, posicaoRaquete, score, alive){
                     velocidadeBolaY -= 5
                 }
             }
-            else if(colisaoRaquete(bola, posicaoRaquete, score, alive)){
+            else if(colisaoRaquete()){
                 velocidadeBolaX = -velocidadeBolaX //Rebate a bola
                 velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) //Com um angulo aleatório 
                 if(velocidadeBolaY > 0){
@@ -144,9 +170,8 @@ function colisaoRaquete(bola, posicaoRaquete, score, alive){
         for(let i  = 0; i  < 10; i++){
             placarBagun.push([testar(jogadores[i]), jogadores[i]])
         }
+        //placarBagun[3][0] = 12 //Para conferir se a ordenação funciona
         placar = placarBagun.sort((a,b) => {return b[0] - a[0]})
-        console.log(" Generation score: ")
-        console.log(placar)
     }
     
     /* Aleatoriamente altera cada gene uma vez, em indivíduos aleatórios, 
@@ -198,13 +223,12 @@ function colisaoRaquete(bola, posicaoRaquete, score, alive){
         gerarPop()
     
         for(let i = 0; i < geracoes; i++){
-            console.log("Generation: " + i)
+            console.log("Generation: " + (i + 1))
             testarPop()
             atualizarPop(chance_mutacao)
-            console.log(jogadores)
-            console.log("  Best individual: " + jogadores[0])
+            console.log("  Best individual: [" +  jogadores[0][0].toFixed(3) + ", " + jogadores[0][1].toFixed(3) + "]")
+            console.log("  Scored: " + placar[0][0])
         }
-    
         return jogadores[0]
     } 
 
