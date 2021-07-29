@@ -1,11 +1,11 @@
 
 
 //Definições do pong
-const velocidadeRaquete = 15
+const velocidadeRaquete = 5
 var posicaoRaquete = 300
 
 var bola = [350, 350, 30]//X, Y, Diâmetro
-var velocidadeBolaX = 15
+var velocidadeBolaX = 5
 var velocidadeBolaY = 0
 
 var score = 0
@@ -13,35 +13,56 @@ var score = 0
 var medDec = 0
 var countDec = 0
 
-var tSize = 100
-
-
+const maxDistHorizontal = 829
+const maxDistVertical = 820
+//Funções do Pong
 /** Restaura os valores iniciais do pong */
-function keyPressed(){
-    if(keyCode === 82){
-      posicaoRaquete = 300
-      bola = [350, 350, 30]
-      velocidadeBolaX = 15
-      velocidadeBolaY = ((Math.floor(Math.random() * 20) - 10))
-      score = 0
-      medDec = 0
-      countDec = 0
-      tSize = 100
-    }
-}
+function reset(){
+    posicaoRaquete = 300
 
+    bola[0] = bola[1] = 350
+    velocidadeBolaX = 15
+    velocidadeBolaY = ((Math.floor(Math.random() * 20) - 10))
+
+    score = 0
+
+    medDec = 0
+    countDec = 0
+}
 
 //Para a bola no meio
 function stop(){
     velocidadeBolaX = 0
     bola = [350, 350, 0]
+}
 
-    score = score + " pts. R to Retry"
-    tSize = 50
-    if(keyIsDown('82')){
-      reset()
+
+function sigmoid(t) {
+    return 1/(1 + Math.pow(Math.E, -t));
+}
+
+/* Recebe alguns pesos, multiplica esses pesos pelas entradas e decide se
+    a raquete deve ir para cima ou para baixo
+*/
+function decidirDirecao(player){
+    if(velocidadeBolaX != 0){
+        var distHorizontal = (abs(bola[0] - 34)/maxDistHorizontal)  //Posição em X do centro da bola - posição da borda direita da raquete
+        var distVertical = (abs(bola[1] - (posicaoRaquete + 60))/maxDistVertical)   //Posição em Y do centro da bola - linha central da raquete
+        var decisor = ((distHorizontal/maxDistHorizontal * player[0]) + (distVertical/maxDistVertical * player[1]))
+        decisor = sigmoid(decisor)
+        console.log(decisor)
+        //console.log(decisor)
+        if(decisor < .5){
+            return 1//para baixo
+        }else {
+            return -1//para cima
+        }
+    }else{
+        return 0
     }
 }
+
+
 
 function colisaoTopo(){
     if(bola[1] - (bola[2]/2) < 24){
@@ -98,6 +119,8 @@ function setup() {
 
 function draw() {
 
+    player = [Math.random(), Math.random()]
+
     //------------------------Desenhando-----------------------------------
 
     background("#77aaff");
@@ -105,7 +128,7 @@ function draw() {
     fill("#FFFFFF");
 
     //Pontuação
-    textSize(tSize);
+    textSize(100);
     text(score, 420, 200);
 
 
@@ -124,17 +147,18 @@ function draw() {
 
 
     //-------------------------Movendo---------------------------------
-    if(keyIsDown(UP_ARROW)){
-      posicaoRaquete += -velocidadeRaquete
-    }else if(keyIsDown(DOWN_ARROW)){
-      posicaoRaquete += velocidadeRaquete
+    
+    if(posicaoRaquete > 25 && decidirDirecao(player) === -1){
+        posicaoRaquete += -velocidadeRaquete
+        if(posicaoRaquete < 26){
+            posicaoRaquete = 26
+        } 
+    }else if(posicaoRaquete <  605 && decidirDirecao(player) === 1){
+        posicaoRaquete += velocidadeRaquete
+        if(posicaoRaquete > 604){
+            posicaoRaquete = 604
+        } 
     }
-    if(posicaoRaquete < 2){
-        posicaoRaquete = 2
-    }else if(posicaoRaquete > height - 122){
-        posicaoRaquete = height - 122
-    }
-  
     
     //Bola
     bola[0] += velocidadeBolaX //Eixo X
@@ -151,3 +175,4 @@ function draw() {
 
     else if(colisaoRaquete()){}  
 }
+
