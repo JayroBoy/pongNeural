@@ -1,20 +1,15 @@
 
 
 //Definições do pong
-    const velocidadeRaquete = 20
-    var posicaoRaquete = 300
+    const velocidadeRaquete = 10
+    var posicaoRaquete = 300//Posição em Y
 
     var bola = [350, 350, 30]//X, Y, Diâmetro
-    var velocidadeBolaX = 20
-    var velocidadeBolaY = Math.floor(Math.random() * 10) - 5
+    var velocidadeBolaX = 10
+    var velocidadeBolaY = 0
 
     var score = 0
 
-    var medDec = 0
-    var countDec = 0
-
-    const maxDistHorizontal = 829
-    const maxDistVertical = 820
 //Funções do Pong
     /** Restaura os valores iniciais do pong */
     function reset(){
@@ -30,59 +25,48 @@
         countDec = 0
     }
 
-    //Para a bola no meio
+    //Some com a bola da tela
     function stop(){
         velocidadeBolaX = 0
         bola = [350, 350, 0]
     }
 
     function colisaoTopo(){
-        if(bola[1] - (bola[2]/2) < 25){
+        if(bola[1] - (bola[2]/2) <= 25){ //Se Y centro da bola menos raio for menor ou igual do que Y da borda inferior do topo
             velocidadeBolaY = -velocidadeBolaY
             return true
         }
         return false 
     }
-
+    
     function colisaoFundo(){
-        if(bola[1] + (bola[2]/2) > 724){
+        if(bola[1] + (bola[2]/2) >= 725){ //Se Y do centro da bola mais raio for maior ou igual do que Y da borda superior do fundo
             velocidadeBolaY = -velocidadeBolaY
             return true
         } 
         return false
     }
-
+    
     function colisaoDireita(){
-        if(bola[0] + (bola[2]/2) > 875){
-            velocidadeBolaX = -velocidadeBolaX
-            velocidadeBolaY = (Math.floor(Math.random() * 10) - 5)
-            if(velocidadeBolaY > 0){
-                velocidadeBolaY += 5
-            }else if(velocidadeBolaY < 0){
-                velocidadeBolaY -= 5
-            } 
+        if(bola[0] + (bola[2]/2) >= 880){ //Se X do centro da bola mais raio for maior ou igual do que X da borda esquerda da parede
+            velocidadeBolaX = -velocidadeBolaX //Rebate a bola
+            velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) //Angulo aleatório
             return true 
         }
         return false
     }
     
     function colisaoRaquete(){
-        if(bola[0] - (bola[2]/2) < 20){
-            if(bola[1]  > posicaoRaquete && bola[1] < posicaoRaquete + 120){
-            velocidadeBolaX = -velocidadeBolaX
-            velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) 
-            if(velocidadeBolaY > 0){
-                velocidadeBolaY += 5
-            }else if(velocidadeBolaY < 0) {
-                velocidadeBolaY -= 5
-            }  
-            score++
+        if(bola[0] - (bola[2]/2) <= 20){//Se X do centro da bola for menor ou igual do que X da borda direita da raquete
+            if(bola[1]  > posicaoRaquete && bola[1] < posicaoRaquete + 120){//Se Y do centro da bola estiver entre Y do topo e Y do fundo da raquete
+            velocidadeBolaX = -velocidadeBolaX //Rebate a bola
+            velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) //Ângulo aleatório 
+            score++//Conta mais um ponto
         }else{
             stop()
             }
         }
     }
-  
 
 //Função setup que começa tudo
     function setup() {
@@ -90,8 +74,6 @@
     }
 
     function draw() {
-
-        player = [.5, .5]
 
         //------------------------Desenhando-----------------------------------
 
@@ -119,11 +101,12 @@
 
 
         //-------------------------Movendo---------------------------------
-        
+        //Segue a bola no eixo Y
         posicaoRaquete = bola[1] - 60
 
+        //Pra raquete não sair da tela
         if(posicaoRaquete < 2){
-            posicaoRaquete = 0
+            posicaoRaquete = 2
         }else if(posicaoRaquete > height - 122){
             posicaoRaquete = height - 122
         }
@@ -135,12 +118,14 @@
 
         //-----------------------Colisões----------------------------------
 
+
+        //Ifs não sao necessários mas nao tem como colidir com topo e fundo/raquete e parede ao mesmo tempo, entao é mais eficiente 
+        //só fazer uma verificação se a outra for falsa
         if (colisaoTopo()){}
 
         else if (colisaoFundo()){}
 
-        else if (colisaoDireita()){}
+        if (colisaoDireita()){}
 
         else if(colisaoRaquete()){}  
     }
-

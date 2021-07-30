@@ -15,11 +15,11 @@ var alive  = true //para saber quando sair do loop
 const velocidadeRaquete = 10 
 var posicaoRaquete = 300
 
-var bola = [350, 350, 30]//X, Y, Diâmetro
+var bola = [430, 360, 30]//X, Y, Diâmetro
 var velocidadeBolaX = 10
 var velocidadeBolaY = Math.floor(Math.random() * 10) - 5
 
-const maxDistHorizontal = 829
+const maxDistHorizontal = 830
 const maxDistVertical = 820
 
 var score = 0
@@ -27,19 +27,23 @@ var height = 750
 
 
 //Funçoes
+
+//Uma função sigmoide para normalizar a saida
 function sigmoid(t) {
     return 1/(1 + Math.pow(Math.E, -t));
 }
 
-
+/* Recebe alguns pesos, multiplica esses pesos pelas entradas e decide se
+    a raquete deve ir para cima ou para baixo
+*/
 function decidirDirecao(player){
     if(velocidadeBolaX != 0){
-        var distHorizontal = (Math.abs(bola[0] - 34)/maxDistHorizontal)  //Posição em X do centro da bola - posição da borda direita da raquete
-        var distVertical = (Math.abs(bola[1] - (posicaoRaquete + 60))/maxDistVertical)   //Posição em Y do centro da bola - linha central da raquete
-        var decisor = ((distHorizontal/maxDistHorizontal * player[0]) + (distVertical/maxDistVertical * player[1]))
+        var distHorizontal = (bola[0] - 35) //Posição em X do centro da bola - posição da borda direita da raquete
+        var distVertical = (bola[1] - (posicaoRaquete + 60))   //Posição em Y do centro da bola - linha central da raquete
+        var decisor = ((distHorizontal * player[0]) + (distVertical * player[1]))
         decisor = sigmoid(decisor)
         //console.log(decisor)
-        if(decisor < .5){
+        if(decisor > .5){
             return 1//para baixo
         }else {
             return -1//para cima
@@ -49,31 +53,30 @@ function decidirDirecao(player){
     }
 }
 
-
 function colisaoTopo(){
-    if(bola[1] - (bola[2]/2) < 25){
+    if(bola[1] - (bola[2]/2) <= 25){
         return true
     }
     return false 
 }
 
 function colisaoFundo(){
-    if(bola[1] + (bola[2]/2) > 724){
+    if(bola[1] + (bola[2]/2) >= 725){
         return true
     } 
     return false
 }
 
 function colisaoDireita(){
-    if(bola[0] + (bola[2]/2) > 875){
+    if(bola[0] + (bola[2]/2) >= 880){
         return true 
     }
     return false
 }
 
 function colisaoRaquete(){
-    if(bola[0] - (bola[2]/2) < 20){ //Se a bola estiver na coluna da raquete
-        if(bola[1]  > posicaoRaquete && bola[1] < posicaoRaquete + 120){ //Se a bola estiver nas linhas da raquete
+    if(bola[0] - (bola[2]/2) <= 20){ //Se estiver na coluna da raquete
+       if(bola[1]  > posicaoRaquete && bola[1] < posicaoRaquete + 120){ //Se estiver em uma das linhas da raquete
             score++//Ganha um ponto
             return true //Diz que colidiu
         }else{//Se estiver na coluna da raquete mas não na linha dela
@@ -93,53 +96,48 @@ function colisaoRaquete(){
  
         posicaoRaquete = 300
 
-        bola = [350, 350, 30]//X, Y, Diâmetro
+        bola = [430, 360, 30]//X, Y, Diâmetro
         velocidadeBolaX = 10
         velocidadeBolaY = Math.floor(Math.random() * 10) - 5
 
         score = 0
-        height = 750
-        let i = 0
 
         while(alive){
+            //-------------------------MOVENDO--------------------------
+            //RAQUETE
             if(decidirDirecao(jogador) === 1){
                 posicaoRaquete += velocidadeRaquete
             }else{
                 posicaoRaquete += -velocidadeRaquete
             }
 
+            //Pra raquete não sair da tela
             if(posicaoRaquete < 2){
                 posicaoRaquete = 2
             }else if(posicaoRaquete > height - 122){
                 posicaoRaquete = height - 122
             }
             
+            //BOLA
             bola[0] += velocidadeBolaX 
             bola[1] += velocidadeBolaY 
     
+            //----------------------CHECANDO COLISÃO--------------------
+            
+            //Os ifs não são necessários mas aumentam a eficiência do programa
             if(colisaoTopo()){
-                velocidadeBolaY = -velocidadeBolaY
+                velocidadeBolaY = -velocidadeBolaY //Bate no topo e muda de direção
             }
             else if(colisaoFundo()){
-                velocidadeBolaY = -velocidadeBolaY
+                velocidadeBolaY = -velocidadeBolaY //Bate no fundo e muda de direção
             }
             else if(colisaoDireita()){
-                velocidadeBolaX = -velocidadeBolaX
-                velocidadeBolaY = (Math.floor(Math.random() * 10) - 5)
-                if(velocidadeBolaY > 0){
-                    velocidadeBolaY += 5
-                }else if(velocidadeBolaY < 0){
-                    velocidadeBolaY -= 5
-                }
+                velocidadeBolaX = -velocidadeBolaX //Bate na parede e é rebatida
+                velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) //Com um angulo aleatório
             }
             else if(colisaoRaquete()){
                 velocidadeBolaX = -velocidadeBolaX //Rebate a bola
                 velocidadeBolaY = (Math.floor(Math.random() * 10) - 5) //Com um angulo aleatório 
-                if(velocidadeBolaY > 0){
-                    velocidadeBolaY += 5
-                }else if(velocidadeBolaY < 0) {
-                    velocidadeBolaY -= 5
-                }
             }
         }
         return score
@@ -184,7 +182,6 @@ function colisaoRaquete(){
         }
     }
     
-    
     /** Percorre a população, cada individuo tem porcentagem% de chance de ter os seus
      *  genes alterados em (porcentagem*4)%, pra mais ou pra menos
      */
@@ -205,6 +202,7 @@ function colisaoRaquete(){
         jogadores[0] = placar[0][1]
         jogadores[1] = placar[1][1]
         jogadores[2] = placar[2][1]
+        jogadores[3] = placar[3][1]
         jogadores[4] = filho(jogadores[0], jogadores[1])
         jogadores[5] = filho(jogadores[0], jogadores[2])
         jogadores[6] = filho(jogadores[0], jogadores[3])
@@ -227,8 +225,8 @@ function colisaoRaquete(){
             testarPop()
             atualizarPop(chance_mutacao)
             console.log("  Best individual: [" +  jogadores[0][0].toFixed(3) + ", " + jogadores[0][1].toFixed(3) + "]")
-            console.log("  Scored: " + placar[0][0])
         }
+
         return jogadores[0]
     } 
 
