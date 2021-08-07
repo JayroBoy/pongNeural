@@ -9,8 +9,18 @@
 var jogadores = [] //Registro da população
 var placar = [] //Classificação da população
 var mediaGeracoes = [] //Média de cada uma das gerações 
+var melhorGeracao = [] // guarda o top score
+var piorGeracao = [] //guarda o pior score
 var popSize = 6
+var generations = 5
 
+//grafico
+var xValues = []
+
+for(let i = 1; i < generations + 1; i++){
+    xValues.push("Generation " + i)
+}
+var ctx = document.getElementById('myChart').getContext('2d');
 
 // PONG
 var alive  = true //para saber quando sair do loop
@@ -198,19 +208,6 @@ function colisaoRaquete(){
             }
         }
     }
-    
-    //Descarta os 50% piores, cruza os 50% melhores. 
-    /** O parametro porcentagem está relacionado tanto à chance de mutacao individual quanto à 
-     * quantidade em que o valor que sofre mutação é alterado */ 
-    // function atualizarPop(porcentagem){
-    //     jogadores[0] = placar[0][1]
-    //     jogadores[1] = placar[1][1]
-    //     jogadores[2] = placar[2][1]
-    //     jogadores[3] = filho(jogadores[1], jogadores[2])
-    //     jogadores[4] = filho(jogadores[0], jogadores[1])
-    //     jogadores[5] = filho(jogadores[0], jogadores[2])
-    //     mutacao_conservadora(porcentagem)
-    // }
 
 
     //Descarta os piores 50%, cruza os melhores 50%
@@ -255,33 +252,56 @@ function colisaoRaquete(){
         for(let i = 0; i < geracoes; i++){
             console.log("Generation: " + (i + 1))
             testarPop()
+            melhorGeracao.push(placar[0][0])//registra o melhor placar
+            piorGeracao.push(placar[popSize-1][0]) //registra o pior placar
             updatePop(chance_mutacao)
             console.log("  Best individual: [" +  jogadores[0][0].toFixed(3) + ", " + jogadores[0][1].toFixed(3) + "]")
             pegaMedia()
-            console.log("  Average: " + mediaGeracoes[i])
+
         }
 
         return jogadores[0]
     } 
 
-    console.log(rodarEvolutivo(30, 7))
+    console.log(rodarEvolutivo(generations, 7))
+    console.log(piorGeracao)
+    console.log(melhorGeracao)
+    new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: xValues,
+          datasets: [
+            {
+                label: "Average",
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "blue",
+                borderColor: "rgba(0,0,255, .5)",
+                data: mediaGeracoes
+            },
+            {
+                label:"Worst",
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "red",
+                borderColor: "rgba(255,0,0, .5)",
+                data: piorGeracao
+            },
+            {
+                label: "Best",
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "green",
+                borderColor: "rgba(0,255,0, .5)",
+                data: melhorGeracao
+            }
+          ]
+          },
+          options: {
+            legend: {display: true},
+            scales: {
+              //yAxes: [{ticks: {min: 6, max:16}}],
+            }
+          }
+        });
 
-    // var ctx = document.getElementById('myChart').getContext('2d');
-    // var myChart = new Chart(ctx, {
-    //         type: 'line',
-    //         data: {
-    //             datasets: [{
-    //                 label: 'Média por geração',
-    //                 data: mediaGeracoes,
-    //                 borderWidth: 1
-    //             }]
-    //         },
-    //         options: {
-    //             scales: {
-    //                 y: {
-    //                     beginAtZero: true
-    //                 }
-    //             }
-    //         }
-    //     }
-    // )
